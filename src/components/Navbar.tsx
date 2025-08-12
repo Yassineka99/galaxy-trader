@@ -1,18 +1,28 @@
+// src/components/Navbar.tsx
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Coins } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { onValue, ref } from "firebase/database";
+import { ref, onValue } from "firebase/database";
 import { db } from "@/integrations/firebase/config";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Coins } from "lucide-react";
 import { CreditsDialogTrigger } from "@/components/CreditsDialog";
+import { motion } from "framer-motion";
+
+interface NavbarProps {
+  onHistoryClick: () => void;
+}
+
 const initials = (name?: string | null) => {
   if (!name) return "U";
-  return name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
+  const parts = name.split(" ");
+  return parts.length > 1 
+    ? `${parts[0][0]}${parts[parts.length - 1][0]}`
+    : parts[0][0];
 };
 
-const Navbar = () => {
+const Navbar = ({ onHistoryClick }: NavbarProps) => {
   const { user, signOut } = useAuth();
   const [credits, setCredits] = useState<number>(0);
 
@@ -39,6 +49,14 @@ const Navbar = () => {
             <span>Credits: {credits}</span>
             <CreditsDialogTrigger />
           </div>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="text-sm bg-gray-800 hover:bg-gray-700 px-3 py-1 rounded-md transition-colors"
+            onClick={onHistoryClick}
+          >
+            Prediction History
+          </motion.button>
           <div className="flex items-center gap-3">
             <Avatar>
               <AvatarImage src={user?.photoURL ?? undefined} alt={user?.displayName ?? "User"} />

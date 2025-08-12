@@ -191,7 +191,7 @@ const ConfirmationDialog = ({
           Confirm Purchase
         </motion.button>
       </DialogTrigger>
-      <DialogContent className="bg-gradient-to-br from-gray-900 to-black border border-purple-700 rounded-xl max-w-md">
+      <DialogContent className="bg-gradient-to-br from-gray-900 to-black border border-purple-700 rounded-xl max-w-md max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-center">
             <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
@@ -203,42 +203,46 @@ const ConfirmationDialog = ({
           </DialogDescription>
         </DialogHeader>
         
-        <div className="space-y-6 py-4">
-          <div className="flex justify-center">
-            <div className="relative">
-              <div className="bg-gray-800 rounded-xl p-2 border border-purple-500">
-                <img 
-                  src={new URL(`../assets/qr-codes/${offer.image}`, import.meta.url).href} 
-                  alt={`Binance QR Code for ${offer.title}`}
-                  className="w-64 h-64 object-contain"
-                />
+        <div className="overflow-y-auto px-6 py-2 flex-1">
+          <div className="space-y-6 py-2">
+            <div className="flex justify-center">
+              <div className="relative">
+                <div className="bg-gray-800 rounded-xl p-2 border border-purple-500">
+                  <img 
+                    src={new URL(`../assets/qr-codes/${offer.image}`, import.meta.url).href} 
+                    alt={`Binance QR Code for ${offer.title}`}
+                    className="w-64 h-64 object-contain"
+                  />
+                </div>
+                <div className="absolute top-2 right-2 bg-purple-600 text-white px-2 py-1 rounded-lg text-xs">
+                  {offer.price}
+                </div>
               </div>
-              <div className="absolute top-2 right-2 bg-purple-600 text-white px-2 py-1 rounded-lg text-xs">
-                {offer.price}
-              </div>
-            </div>
-          </div>
-          
-          <div className="space-y-3">
-            <div>
-              <Label htmlFor="orderId" className="text-gray-300 mb-2 block">
-                Binance Order ID
-              </Label>
-              <Input
-                id="orderId"
-                value={orderId}
-                onChange={(e) => setOrderId(e.target.value)}
-                placeholder="Enter your order ID"
-                className="bg-gray-800 border-gray-700 text-white"
-              />
             </div>
             
-            <div className="text-xs text-gray-400">
-              <p>After completing payment on Binance, you'll receive an Order ID.</p>
-              <p className="mt-1">Enter it here to verify your purchase and add credits to your account.</p>
+            <div className="space-y-3">
+              <div>
+                <Label htmlFor="orderId" className="text-gray-300 mb-2 block">
+                  Binance Order ID
+                </Label>
+                <Input
+                  id="orderId"
+                  value={orderId}
+                  onChange={(e) => setOrderId(e.target.value)}
+                  placeholder="Enter your order ID"
+                  className="bg-gray-800 border-gray-700 text-white"
+                />
+              </div>
+              
+              <div className="text-xs text-gray-400">
+                <p>After completing payment on Binance, you'll receive an Order ID.</p>
+                <p className="mt-1">Enter it here to verify your purchase and add credits to your account.</p>
+              </div>
             </div>
           </div>
-          
+        </div>
+        
+        <div className="px-6 pb-4">
           <Button 
             onClick={handleSubmit}
             disabled={isProcessing}

@@ -8,7 +8,7 @@ import { toast } from "@/components/ui/use-toast";
 import { motion } from "framer-motion";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { format } from "date-fns";
-
+import PredictionCard from "@/components/PredictionCard";
 // Binance API functions
 const fetchHistoricalData = async (symbol = "BTCUSDT", interval = "1h", limit = 720) => {
   try {
@@ -451,57 +451,10 @@ const Dashboard = () => {
             <PriceCard symbol="ethusdt" />
             
             {/* Prediction Card (replaces credits card) */}
-            <div 
-              className="bg-gradient-to-br from-gray-900 to-black p-5 rounded-xl border border-gray-700 cursor-pointer hover:border-purple-500 transition-colors"
+            <PredictionCard 
+              prediction={latestPrediction} 
               onClick={() => latestPrediction && openPredictionDetails(latestPrediction)}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className="text-lg font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                    Latest Prediction
-                  </h3>
-                  <p className="text-sm text-gray-400">
-                    {latestPrediction ? "Click to view details" : "Make your first prediction"}
-                  </p>
-                </div>
-                <div className={`text-xl font-bold ${latestPrediction?.action.includes("BUY") ? "text-green-400" : "text-red-400"}`}>
-                  {latestPrediction?.action || "—"}
-                </div>
-              </div>
-              
-              {latestPrediction ? (
-                <div className="space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-400">Accuracy</span>
-                    <span className="font-bold text-green-400">{latestPrediction.accuracy}%</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-400">Timeframe</span>
-                    <span className="font-bold">{latestPrediction.timeframe}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-400">Generated</span>
-                    <span className="font-bold">
-                      {format(new Date(latestPrediction.timestamp), "MMM d, h:mm a")}
-                    </span>
-                  </div>
-                </div>
-              ) : (
-                <div className="h-20 flex items-center justify-center text-gray-500">
-                  No predictions yet
-                </div>
-              )}
-              
-              <div className="mt-4 pt-4 border-t border-gray-800 flex justify-between items-center">
-                <span className="text-sm text-gray-400">Available credits: {credits}</span>
-                <button 
-                  className="text-xs text-purple-400 hover:text-purple-300"
-                  onClick={() => setIsHistoryModalOpen(true)}
-                >
-                  View History
-                </button>
-              </div>
-            </div>
+            />
           </div>
         </div>
         

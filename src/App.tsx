@@ -11,6 +11,8 @@ import Dashboard from "./pages/Dashboard";
 import { AuthProvider } from "./contexts/AuthContext";
 import PrivateRoute from "./components/PrivateRoute";
 import Profile from "@/pages/Profile";
+import VIP from "@/pages/VIP"; // Import VIP page
+import Rewards from "@/pages/Rewards"; // Import Rewards page
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -38,6 +40,24 @@ const App = () => (
               element={
                 <PrivateRoute>
                   <Profile />
+                </PrivateRoute>
+              }
+            />
+                        {/* New VIP Route */}
+                        <Route
+              path="/vip"
+              element={
+                <PrivateRoute>
+                  <VIP />
+                </PrivateRoute>
+              }
+            />
+            {/* New Rewards Route */}
+            <Route
+              path="/rewards"
+              element={
+                <PrivateRoute>
+                  <Rewards />
                 </PrivateRoute>
               }
             />

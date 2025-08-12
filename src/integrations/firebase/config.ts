@@ -14,7 +14,30 @@ const firebaseConfig = {
   appId: "1:359363523210:web:bd605a49c37809508cb373",
   measurementId: "G-FVHQCJNEDE"
 };
-
+// Add to firebaseConfig:
+export const userSchema = {
+  credits: 0,
+  diamonds: 0,
+  xp: 0,
+  level: 1,
+  streak: 0,
+  lastLogin: null,
+  adCountToday: 0,
+  adCountResetDate: null,
+  vipExpiry: null,
+  referralCode: "",
+  referredBy: "",
+  tasks: {
+    daily: {
+      adsWatched: 0,
+      linkShared: false
+    },
+    weekly: {
+      adsWatched: 0,
+      referrals: 0
+    }
+  }
+};
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 export const auth = getAuth(app);

@@ -372,7 +372,8 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black">
       <Navbar onHistoryClick={() => setIsHistoryModalOpen(true)} />
-      <main className="container mx-auto px-4 sm:px-6 py-8 space-y-8">
+      {/* Changed py-8 to pt-16 pb-8 */}
+      <main className="container mx-auto px-4 sm:px-6 pt-16 pb-8 space-y-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 relative">
             <TradingView />

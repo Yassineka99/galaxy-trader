@@ -1,146 +1,328 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+// src/components/Navbar.tsx
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { ref, onValue } from "firebase/database";
-import { db } from "@/integrations/firebase/config";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Coins, Menu, X } from "lucide-react";
-import { CreditsDialogTrigger } from "@/components/CreditsDialog";
 import { motion } from "framer-motion";
+import { Coins, Diamond, BarChart2, Star, Menu, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { CreditsDialogTrigger } from "@/components/CreditsDialog";
+import { cn } from "@/lib/utils";
 
-interface NavbarProps {
-  onHistoryClick: () => void;
-}
+const Navbar = ({ onHistoryClick }: { onHistoryClick: () => void }) => {
+  const { user, userData, signOut } = useAuth();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
 
-const initials = (name?: string | null) => {
-  if (!name) return "U";
-  const parts = name.split(" ");
-  return parts.length > 1 
-    ? `${parts[0][0]}${parts[parts.length - 1][0]}`
-    : parts[0][0];
-};
-
-const Navbar = ({ onHistoryClick }: NavbarProps) => {
-  const { user, signOut } = useAuth();
-  const [credits, setCredits] = useState<number>(0);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+  // Close mobile menu when route changes
   useEffect(() => {
-    if (!user) return;
-    const creditsRef = ref(db, `users/${user.uid}/credits`);
-    const unsubscribe = onValue(creditsRef, (snap) => {
-      const v = snap.val();
-      setCredits(typeof v === "number" ? v : 0);
-    });
-    return () => unsubscribe();
-  }, [user]);
+    setMobileMenuOpen(false);
+  }, [location]);
+
+  // Navbar scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const isVIP = userData?.vipExpiry && new Date(userData.vipExpiry) > new Date();
 
   return (
-    <nav className="sticky top-0 z-30 w-full">
-      <div className="glass-panel mx-4 mt-4 flex items-center justify-between px-4 py-3">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="h-2 w-2 rounded-full bg-accent animate-pulse" />
-          <span className="font-semibold">Galaxy Trader</span>
-        </Link>
-        
-        {/* Mobile menu button */}
-        <div className="flex items-center gap-4 sm:hidden">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Coins className="h-4 w-4" />
-            <span>{credits}</span>
+    <header 
+      className={cn(
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+        isScrolled 
+          ? "bg-gradient-to-b from-gray-900 to-black backdrop-blur-md border-b border-gray-800" 
+          : "bg-transparent"
+      )}
+    >
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <Link to="/dashboard" className="flex items-center gap-2">
+            <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-1.5 rounded-lg">
+              <BarChart2 className="h-5 w-5 text-white" />
+            </div>
+            <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+              Galaxy Trader
+            </span>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center gap-1">
+            <NavLink to="/dashboard" active={location.pathname === "/dashboard"}>
+              Dashboard
+            </NavLink>
+            <NavLink to="/rewards" active={location.pathname === "/rewards"}>
+              Rewards
+            </NavLink>
+            <NavLink to="/vip" active={location.pathname === "/vip"}>
+              VIP
+            </NavLink>
+            <Button 
+              variant="outline" 
+              onClick={onHistoryClick}
+              className="ml-2"
+            >
+              History
+            </Button>
+          </nav>
+
+          {/* User Stats */}
+          <div className="hidden md:flex items-center gap-4">
+            {/* VIP Badge */}
+            {isVIP && (
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="px-3 py-1 rounded-full bg-gradient-to-r from-yellow-700 to-amber-700 text-xs font-medium flex items-center gap-1"
+              >
+                <Star className="h-3 w-3" />
+                <span>VIP</span>
+              </motion.div>
+            )}
+
+            {/* Diamonds */}
+            <div className="flex items-center gap-1.5 bg-gray-800/50 px-3 py-1 rounded-full">
+              <Diamond className="h-4 w-4 text-blue-400" />
+              <span className="font-medium text-sm">{((+(userData?.diamonds)) || 0).toFixed(3)}</span>
+            </div>
+
+            {/* Level */}
+            <div className="flex items-center gap-1.5 bg-gray-800/50 px-3 py-1 rounded-full">
+              <BarChart2 className="h-4 w-4 text-yellow-400" />
+              <span className="font-medium text-sm">Lvl {userData?.level || 1}</span>
+            </div>
+
+            {/* Credits */}
+            <div className="flex items-center gap-1.5 bg-gray-800/50 px-3 py-1 rounded-full">
+              <Coins className="h-4 w-4 text-yellow-400" />
+              <span className="font-medium text-sm">{userData?.credits || 0}</span>
+            </div>
+
+            {/* Add Credits Button */}
             <CreditsDialogTrigger />
+
+            {/* Profile Dropdown */}
+            <ProfileDropdown user={user} signOut={signOut} />
           </div>
+
+          {/* Mobile Menu Button */}
           <Button 
             variant="ghost" 
             size="icon"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="md:hidden"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
-            {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </Button>
         </div>
-        
-        {/* Desktop menu */}
-        <div className="hidden sm:flex items-center gap-4">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Coins className="h-4 w-4" />
-            <span>Credits: {credits}</span>
-            <CreditsDialogTrigger />
-          </div>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="text-sm bg-gray-800 hover:bg-gray-700 px-3 py-1 rounded-md transition-colors"
-            onClick={onHistoryClick}
-          >
-            Prediction History
-          </motion.button>
-          <div className="flex items-center gap-3">
-            <Link to="/profile">
-              <Avatar>
-                <AvatarImage 
-                  src={user?.photoURL ?? undefined} 
-                  alt={user?.displayName ?? "User"} 
-                />
-                <AvatarFallback>{initials(user?.displayName)}</AvatarFallback>
-              </Avatar>
-            </Link>
-            <Button variant="ghost" onClick={() => signOut()}>Sign out</Button>
-          </div>
-        </div>
       </div>
-      
-      {/* Mobile menu dropdown */}
-      {isMenuOpen && (
-        <motion.div 
-          className="absolute top-full left-0 right-0 bg-gray-900 border-t border-gray-800 z-40"
+
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
           exit={{ opacity: 0, height: 0 }}
-          transition={{ duration: 0.3 }}
+          className="md:hidden bg-gradient-to-b from-gray-900 to-black border-t border-gray-800"
         >
-          <div className="p-4 space-y-4">
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="w-full text-left py-2 px-4 bg-gray-800 hover:bg-gray-700 rounded-md transition-colors"
-              onClick={() => {
-                onHistoryClick();
-                setIsMenuOpen(false);
-              }}
-            >
-              Prediction History
-            </motion.button>
-            
-            <Link 
-              to="/profile" 
-              className="flex items-center gap-3 py-2 px-4 rounded-md hover:bg-gray-800 transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              <Avatar className="w-8 h-8">
-                <AvatarImage 
-                  src={user?.photoURL ?? undefined} 
-                  alt={user?.displayName ?? "User"} 
-                />
-                <AvatarFallback>{initials(user?.displayName)}</AvatarFallback>
-              </Avatar>
-              <span>Profile</span>
-            </Link>
-            
-            <Button 
-              variant="destructive"
-              className="w-full"
-              onClick={() => {
-                signOut();
-                setIsMenuOpen(false);
-              }}
-            >
-              Sign out
-            </Button>
+          <div className="container mx-auto px-4 py-4">
+            <nav className="flex flex-col gap-2 mb-6">
+              <MobileNavLink 
+                to="/dashboard" 
+                active={location.pathname === "/dashboard"}
+              >
+                Dashboard
+              </MobileNavLink>
+              <MobileNavLink 
+                to="/rewards" 
+                active={location.pathname === "/rewards"}
+              >
+                Rewards
+              </MobileNavLink>
+              <MobileNavLink 
+                to="/vip" 
+                active={location.pathname === "/vip"}
+              >
+                VIP
+              </MobileNavLink>
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  onHistoryClick();
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full justify-start mt-2"
+              >
+                Prediction History
+              </Button>
+            </nav>
+
+            <div className="grid grid-cols-3 gap-3 mb-6">
+              {/* Diamonds */}
+              <div className="flex flex-col items-center bg-gray-800/50 p-2 rounded-lg">
+                <Diamond className="h-5 w-5 text-blue-400 mb-1" />
+                <span className="text-sm font-medium">{((+(userData?.diamonds)) || 0).toFixed(3)}</span>
+                <span className="text-xs text-gray-400">Diamonds</span>
+              </div>
+
+              {/* Level */}
+              <div className="flex flex-col items-center bg-gray-800/50 p-2 rounded-lg">
+                <BarChart2 className="h-5 w-5 text-yellow-400 mb-1" />
+                <span className="text-sm font-medium">Lvl {userData?.level || 1}</span>
+                <span className="text-xs text-gray-400">Level</span>
+              </div>
+
+              {/* Credits */}
+              <div className="flex flex-col items-center bg-gray-800/50 p-2 rounded-lg">
+                <Coins className="h-5 w-5 text-yellow-400 mb-1" />
+                <span className="text-sm font-medium">{userData?.credits || 0}</span>
+                <span className="text-xs text-gray-400">Credits</span>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <CreditsDialogTrigger />
+              <Button 
+                variant="outline" 
+                className="flex-1"
+                onClick={() => {
+                  signOut();
+                  setMobileMenuOpen(false);
+                }}
+              >
+                Sign Out
+              </Button>
+            </div>
           </div>
         </motion.div>
       )}
-    </nav>
+    </header>
+  );
+};
+
+// NavLink Component
+const NavLink = ({ 
+  to, 
+  children, 
+  active 
+}: { 
+  to: string, 
+  children: React.ReactNode, 
+  active: boolean 
+}) => {
+  return (
+    <Link 
+      to={to}
+      className={cn(
+        "px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+        active 
+          ? "bg-gradient-to-r from-purple-900/50 to-blue-900/50 text-white" 
+          : "text-gray-300 hover:bg-gray-800/50"
+      )}
+    >
+      {children}
+    </Link>
+  );
+};
+
+// MobileNavLink Component
+const MobileNavLink = ({ 
+  to, 
+  children, 
+  active 
+}: { 
+  to: string, 
+  children: React.ReactNode, 
+  active: boolean 
+}) => {
+  return (
+    <Link 
+      to={to}
+      className={cn(
+        "px-4 py-3 rounded-lg text-base font-medium transition-colors",
+        active 
+          ? "bg-gradient-to-r from-purple-900/50 to-blue-900/50 text-white" 
+          : "text-gray-300 hover:bg-gray-800/50"
+      )}
+    >
+      {children}
+    </Link>
+  );
+};
+
+// Profile Dropdown Component
+const ProfileDropdown = ({ user, signOut }: { user: any, signOut: () => void }) => {
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  
+  const initials = (name?: string | null) => {
+    if (!name) return "U";
+    const parts = name.split(" ");
+    return parts.length > 1 
+      ? `${parts[0][0]}${parts[parts.length - 1][0]}`
+      : parts[0][0];
+  };
+
+  return (
+    <div className="relative">
+      <button 
+        onClick={() => setDropdownOpen(!dropdownOpen)}
+        className="flex items-center gap-2 focus:outline-none"
+      >
+        <Avatar className="w-8 h-8">
+          <AvatarImage src={user?.photoURL ?? undefined} alt={user?.displayName ?? "User"} />
+          <AvatarFallback className="text-xs">
+            {user?.displayName ? initials(user.displayName) : "U"}
+          </AvatarFallback>
+        </Avatar>
+      </button>
+
+      {dropdownOpen && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="absolute right-0 mt-2 w-56 bg-gradient-to-br from-gray-900 to-black border border-gray-700 rounded-lg shadow-lg z-50 overflow-hidden"
+        >
+          <div className="p-4 border-b border-gray-700">
+            <div className="flex items-center gap-3">
+              <Avatar className="w-10 h-10">
+                <AvatarImage src={user?.photoURL ?? undefined} alt={user?.displayName ?? "User"} />
+                <AvatarFallback className="text-sm">
+                  {user?.displayName ? initials(user.displayName) : "U"}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="font-medium text-sm truncate max-w-[140px]">
+                  {user?.displayName || "Galaxy Trader"}
+                </p>
+                <p className="text-xs text-gray-400 truncate max-w-[140px]">
+                  {user?.email}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-2">
+            <Link 
+              to="/profile" 
+              className="block px-3 py-2 text-sm rounded-lg hover:bg-gray-800/50 transition-colors"
+            >
+              Profile Settings
+            </Link>
+            <button
+              onClick={signOut}
+              className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-red-900/50 transition-colors"
+            >
+              Sign Out
+            </button>
+          </div>
+        </motion.div>
+      )}
+    </div>
   );
 };
 

@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { auth, googleProvider } from "@/integrations/firebase/config";
+import { auth, googleProvider, db } from "@/integrations/firebase/config";
 import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
@@ -8,8 +8,10 @@ import {
   signInWithPopup,
   sendEmailVerification,
   updateProfile,
+  getAdditionalUserInfo,
   User,
 } from "firebase/auth";
+import { ref, set, get, child } from "firebase/database";
 import { toast } from "sonner";
 
 interface AuthContextType {
@@ -38,6 +40,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signUp = async (firstName: string, lastName: string, email: string, password: string) => {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(cred.user, { displayName: `${firstName} ${lastName}`.trim() });
+    // Save user profile in Realtime Database with initial credits
+    await set(ref(db, `users/${cred.user.uid}`), {
+      firstName,
+      lastName,
+      email,
+      credits: 0,
+      createdAt: Date.now(),
+    });
     await sendEmailVerification(cred.user);
     toast("Verification email sent. Please check your inbox.");
   };
@@ -49,9 +59,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signInWithGoogle = async () => {
     const cred = await signInWithPopup(auth, googleProvider);
+    const info = getAdditionalUserInfo(cred);
+
+    if (info?.isNewUser) {
+      const displayName = cred.user.displayName || "";
+      const [firstName = "", ...rest] = displayName.split(" ");
+      const lastName = rest.join(" ");
+
+      await set(ref(db, `users/${cred.user.uid}`), {
+        firstName,
+        lastName,
+        email: cred.user.email || "",
+        credits: 0,
+        createdAt: Date.now(),
+      });
+    }
+
     if (!cred.user.emailVerified) {
-      try { await sendEmailVerification(cred.user); } catch {}
-      toast("Verification email sent to your Google account email.");
+      try {
+        await sendEmailVerification(cred.user);
+        toast("Verification email sent to your Google account email.");
+      } catch {}
     }
     return cred.user;
   };

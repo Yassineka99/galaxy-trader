@@ -9,11 +9,13 @@ import {
   DialogTrigger 
 } from "@/components/ui/dialog";
 import { db } from "@/integrations/firebase/config";
-import { ref, runTransaction } from "firebase/database";
+import { ref, runTransaction, set } from "firebase/database";
 import { Plus } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface Offer {
   key: string;
@@ -21,16 +23,17 @@ interface Offer {
   price: string;
   credits: number;
   description: string[];
-  paypalUrl: string;
+  image: string;
+  savings?: string;
 }
 
 const offers: Offer[] = [
   {
-    key: "small",
-    title: "Small Pack",
-    price: "$25",
+    key: "starter",
+    title: "Starter Spark",
+    price: "$5",
     credits: 50,
-    paypalUrl: "https://www.paypal.com/ncp/payment/B4CHYA7JUSW6U",
+    image: "5.jpeg",
     description: [
       "Perfect for trying the app or making a quick single prediction.",
       "50 credits total",
@@ -39,55 +42,73 @@ const offers: Offer[] = [
     ],
   },
   {
-    key: "starter",
-    title: "Starter Pack",
-    price: "$40",
-    credits: 100,
-    paypalUrl: "https://www.paypal.com/ncp/payment/GKT8V879P8H74",
+    key: "value",
+    title: "Value Boost",
+    price: "$15",
+    credits: 170,
+    image: "15.jpeg",
+    savings: "Saving 11.8% off",
     description: [
       "Great value for casual traders who want more than one shot.",
-      "100 credits total (enough for 2 predictions)",
-      "20% cheaper per credit than Small Pack",
+      "170 credits total (enough for 3 predictions)",
+      "11.8% cheaper per credit than Starter Spark",
       "Recommended for beginners looking to test strategies",
     ],
   },
   {
-    key: "value",
-    title: "Value Pack",
-    price: "$100",
-    credits: 350,
-    paypalUrl: "https://www.paypal.com/ncp/payment/45JZLPTV7TGDL",
+    key: "pro",
+    title: "Pro Edge",
+    price: "$30",
+    credits: 360,
+    image: "30.jpeg",
+    savings: "Saving 16.7% off",
     description: [
       "The sweet spot for regular users, with big savings.",
-      "350 credits total (enough for 7 predictions)",
-      "40% cheaper per credit than Small Pack",
+      "360 credits total (enough for 7 predictions)",
+      "16.7% cheaper per credit than Starter Spark",
       "Best for consistent traders",
     ],
   },
   {
-    key: "pro",
-    title: "Pro Pack",
-    price: "$185",
-    credits: 750,
-    paypalUrl: "https://www.paypal.com/ncp/payment/5VBYMZ6LZND7J",
+    key: "elite",
+    title: "Elite Wave",
+    price: "$60",
+    credits: 780,
+    image: "60.jpeg",
+    savings: "Saving 23.1% off",
     description: [
       "Maximum value for serious traders who want the most plays.",
-      "750 credits total (enough for 15 predictions)",
-      "50% cheaper per credit than Small Pack",
+      "780 credits total (enough for 15 predictions)",
+      "23.1% cheaper per credit than Starter Spark",
       "Perfect for high-frequency users",
     ],
   },
   {
     key: "master",
-    title: "Master Pack",
-    price: "$400",
-    credits: 2000,
-    paypalUrl: "https://www.paypal.com/ncp/payment/3RA5LXHSFDG5L",
+    title: "Master Flow",
+    price: "$100",
+    credits: 1400,
+    image: "100.jpeg",
+    savings: "Saving 28.6% off",
     description: [
       "The ultimate bulk deal for professionals.",
-      "2000 credits total (enough for 40 predictions)",
-      "60% cheaper per credit than Small Pack",
+      "1400 credits total (enough for 28 predictions)",
+      "28.6% cheaper per credit than Starter Spark",
       "Designed for traders who want long-term usage without reloading",
+    ],
+  },
+  {
+    key: "titan",
+    title: "Titan Max",
+    price: "$150",
+    credits: 2250,
+    image: "150.jpeg",
+    savings: "Saving 33.3% off",
+    description: [
+      "The ultimate professional package for unlimited trading.",
+      "2250 credits total (enough for 45 predictions)",
+      "33.3% cheaper per credit than Starter Spark",
+      "For traders who want maximum value and power",
     ],
   },
 ];
@@ -128,6 +149,119 @@ const StarBackground = () => {
   );
 };
 
+const ConfirmationDialog = ({ 
+  offer, 
+  onConfirm 
+}: { 
+  offer: Offer; 
+  onConfirm: (orderId: string) => void 
+}) => {
+  const [orderId, setOrderId] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!orderId.trim()) {
+      toast({ title: "Order ID required", description: "Please enter your Binance Order ID", variant: "destructive" });
+      return;
+    }
+    
+    setIsProcessing(true);
+    try {
+      await onConfirm(orderId);
+      setIsOpen(false);
+      setOrderId("");
+    } catch (error) {
+      console.error("Error confirming order:", error);
+      toast({ title: "Confirmation failed", description: "Couldn't confirm your order. Please try again.", variant: "destructive" });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="w-full py-2 px-4 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg text-white font-medium hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg shadow-purple-500/20"
+          aria-label={`Confirm ${offer.title} purchase`}
+        >
+          Confirm Purchase
+        </motion.button>
+      </DialogTrigger>
+      <DialogContent className="bg-gradient-to-br from-gray-900 to-black border border-purple-700 rounded-xl max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-bold text-center">
+            <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+              Confirm Your Order
+            </span>
+          </DialogTitle>
+          <DialogDescription className="text-center text-gray-300">
+            Please enter your Binance Order ID
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="space-y-6 py-4">
+          <div className="flex justify-center">
+            <div className="relative">
+              <div className="bg-gray-800 rounded-xl p-2 border border-purple-500">
+                <img 
+                  src={new URL(`../assets/qr-codes/${offer.image}`, import.meta.url).href} 
+                  alt={`Binance QR Code for ${offer.title}`}
+                  className="w-64 h-64 object-contain"
+                />
+              </div>
+              <div className="absolute top-2 right-2 bg-purple-600 text-white px-2 py-1 rounded-lg text-xs">
+                {offer.price}
+              </div>
+            </div>
+          </div>
+          
+          <div className="space-y-3">
+            <div>
+              <Label htmlFor="orderId" className="text-gray-300 mb-2 block">
+                Binance Order ID
+              </Label>
+              <Input
+                id="orderId"
+                value={orderId}
+                onChange={(e) => setOrderId(e.target.value)}
+                placeholder="Enter your order ID"
+                className="bg-gray-800 border-gray-700 text-white"
+              />
+            </div>
+            
+            <div className="text-xs text-gray-400">
+              <p>After completing payment on Binance, you'll receive an Order ID.</p>
+              <p className="mt-1">Enter it here to verify your purchase and add credits to your account.</p>
+            </div>
+          </div>
+          
+          <Button 
+            onClick={handleSubmit}
+            disabled={isProcessing}
+            className="w-full py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+          >
+            {isProcessing ? (
+              <>
+                <svg className="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Verifying...
+              </>
+            ) : (
+              `Confirm ${offer.title} Purchase`
+            )}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 const OfferCard = ({ offer }: { offer: Offer }) => {
   const { user } = useAuth();
   const [isHovered, setIsHovered] = useState(false);
@@ -142,9 +276,40 @@ const OfferCard = ({ offer }: { offer: Offer }) => {
         const value = typeof current === "number" ? current : 0;
         return value + amount;
       });
-      toast({ title: "Credits added", description: `+${amount} credits added to your account (test).` });
+      toast({ 
+        title: "Test Credits Added", 
+        description: `+${amount} TEST credits added to your account. This is for testing only.`,
+      });
     } catch (e) {
       toast({ title: "Update failed", description: "Couldn't add credits. Please try again.", variant: "destructive" });
+    }
+  };
+
+  const saveOrder = async (orderId: string) => {
+    if (!user) return;
+    
+    const orderData = {
+      orderId,
+      userId: user.uid,
+      userEmail: user.email || "unknown",
+      offerKey: offer.key,
+      credits: offer.credits,
+      price: offer.price,
+      timestamp: new Date().toISOString(),
+      status:"false",
+      hide:"false"
+    };
+    
+    try {
+      const orderRef = ref(db, `orderRequests/${orderId}`);
+      await set(orderRef, orderData);
+      toast({ 
+        title: "Order Submitted", 
+        description: `Your order #${orderId} has been received. Credits will be added to your account after verification (within 1 hour).`,
+      });
+    } catch (error) {
+      console.error("Error saving order:", error);
+      throw error;
     }
   };
 
@@ -193,6 +358,11 @@ const OfferCard = ({ offer }: { offer: Offer }) => {
               {offer.credits} credits
             </span>
           </div>
+          {offer.savings && (
+            <div className="mt-2 text-xs bg-green-900/30 text-green-300 px-2 py-1 rounded-md inline-block">
+              {offer.savings}
+            </div>
+          )}
         </header>
 
         <ul className="text-sm space-y-2 mb-5">
@@ -207,25 +377,18 @@ const OfferCard = ({ offer }: { offer: Offer }) => {
         </ul>
 
         <div className="flex flex-col gap-3">
-          <form action={offer.paypalUrl} method="post" target="_blank">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="w-full py-2 px-4 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg text-white font-medium hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg shadow-purple-500/20"
-              type="submit"
-              aria-label={`Buy ${offer.title} with PayPal`}
-            >
-              Buy with PayPal
-            </motion.button>
-          </form>
+          <ConfirmationDialog 
+            offer={offer} 
+            onConfirm={saveOrder} 
+          />
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="w-full py-2 px-4 bg-gray-800 hover:bg-gray-700 rounded-lg text-white font-medium transition-all"
             onClick={() => addCredits(offer.credits)}
-            aria-label={`Mark ${offer.title} as paid (test)`}
+            aria-label={`Add ${offer.credits} credits for testing`}
           >
-            Mark as paid (test)
+            Add Credits (Test)
           </motion.button>
         </div>
       </div>
@@ -246,7 +409,7 @@ export const CreditsDialogTrigger = () => {
           <Plus className="h-5 w-5" />
         </motion.button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[85vh] bg-gray-900 border border-gray-700 rounded-xl overflow-hidden">
+      <DialogContent className="max-w-5xl max-h-[85vh] bg-gray-900 border border-gray-700 rounded-xl overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-gray-900 to-black opacity-90" />
         <StarBackground />
         
@@ -257,13 +420,13 @@ export const CreditsDialogTrigger = () => {
             </span>
           </DialogTitle>
           <DialogDescription className="text-gray-300">
-            Test-only PayPal buttons. Complete payment in the new tab, then click "Mark as paid (test)" to add credits.
+            Scan Binance QR code to purchase credits. After payment, enter your Order ID to confirm.
           </DialogDescription>
         </DialogHeader>
         
         <div className="relative z-10 overflow-y-auto pr-2 -mr-2 max-h-[60vh]">
           <motion.section 
-            className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-2"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-2"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -282,7 +445,7 @@ export const CreditsDialogTrigger = () => {
         </div>
         
         <p className="relative z-10 text-xs text-gray-400 mt-3 pt-3 border-t border-gray-800">
-          Note: This flow is for testing only and does not verify payments automatically. 
+          Note: After payment confirmation, credits are added immediately. For test purposes, use "Add Credits" button.
           <span className="block mt-1 text-indigo-300">✨ Galaxy Credits - Trade Among The Stars ✨</span>
         </p>
       </DialogContent>

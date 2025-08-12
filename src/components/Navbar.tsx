@@ -58,10 +58,15 @@ const Navbar = ({ onHistoryClick }: NavbarProps) => {
             Prediction History
           </motion.button>
           <div className="flex items-center gap-3">
-            <Avatar>
-              <AvatarImage src={user?.photoURL ?? undefined} alt={user?.displayName ?? "User"} />
-              <AvatarFallback>{initials(user?.displayName)}</AvatarFallback>
-            </Avatar>
+            <Link to="/profile">
+              <Avatar>
+                <AvatarImage 
+                  src={user?.photoURL ?? undefined} 
+                  alt={user?.displayName ?? "User"} 
+                />
+                <AvatarFallback>{initials(user?.displayName)}</AvatarFallback>
+              </Avatar>
+            </Link>
             <Button variant="ghost" onClick={() => signOut()}>Sign out</Button>
           </div>
         </div>

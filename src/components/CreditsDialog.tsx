@@ -137,19 +137,23 @@ export const CreditsDialogTrigger = () => {
           <Plus className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="max-w-3xl max-h-[80vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Add Credits</DialogTitle>
           <DialogDescription>
             Test-only PayPal buttons. Complete payment in the new tab, then click "Mark as paid (test)" to add credits.
           </DialogDescription>
         </DialogHeader>
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {offers.map((o) => (
-            <OfferCard offer={o} key={o.key} />
-          ))}
-        </section>
-        <p className="text-xs text-muted-foreground mt-2">
+        
+        <div className="overflow-y-auto pr-2 -mr-2">
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-1">
+            {offers.map((o) => (
+              <OfferCard offer={o} key={o.key} />
+            ))}
+          </section>
+        </div>
+        
+        <p className="text-xs text-muted-foreground mt-2 pt-2 border-t">
           Note: This flow is for testing only and does not verify payments automatically.
         </p>
       </DialogContent>

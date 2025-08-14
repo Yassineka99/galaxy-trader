@@ -231,7 +231,8 @@ const Index = () => {
       {/* CTA Section */}
       <section className="relative py-20 bg-gradient-to-r from-primary/10 to-accent/10">
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-[url('@/assets/star-pattern.svg')] opacity-10"></div>
+          <div className="absolute inset-0 opacity-10"></div>
+
         </div>
         <div className="container mx-auto px-6 text-center relative z-10">
           <div className="max-w-3xl mx-auto">

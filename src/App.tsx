@@ -13,6 +13,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import Profile from "@/pages/Profile";
 import VIP from "@/pages/VIP"; // Import VIP page
 import Rewards from "@/pages/Rewards"; // Import Rewards page
+import RunGame from "./pages/Minigames/RunGame";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -58,6 +59,23 @@ const App = () => (
               element={
                 <PrivateRoute>
                   <Rewards />
+                </PrivateRoute>
+              }
+            />
+                        {/* Minigames - default and with id */}
+                        <Route
+              path="/minigames"
+              element={
+                <PrivateRoute>
+                  <RunGame />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/minigames/:id"
+              element={
+                <PrivateRoute>
+                  <RunGame />
                 </PrivateRoute>
               }
             />

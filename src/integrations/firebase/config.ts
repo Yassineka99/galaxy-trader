@@ -5,14 +5,14 @@ import { getAnalytics } from "firebase/analytics";
 // TODO: Replace the placeholders below with your Firebase Web App config.
 // You can find it in Firebase Console > Project Settings > General > Your apps (Web)
 const firebaseConfig = {
-  apiKey: "AIzaSyChkQLTQDu7dToIB4g5vsrZ0eimJXfgD6g",
-  authDomain: "binance-live-predictor-pro.firebaseapp.com",
-  databaseURL: "https://binance-live-predictor-pro-default-rtdb.firebaseio.com",
-  projectId: "binance-live-predictor-pro",
-  storageBucket: "binance-live-predictor-pro.firebasestorage.app",
-  messagingSenderId: "359363523210",
-  appId: "1:359363523210:web:bd605a49c37809508cb373",
-  measurementId: "G-FVHQCJNEDE"
+  apiKey: "AIzaSyA0eZOJDDf1sJDkvFJVYE3k-VZPu69WPY8",
+  authDomain: "galaxy-trader.firebaseapp.com",
+  databaseURL: "https://galaxy-trader-default-rtdb.firebaseio.com",
+  projectId: "galaxy-trader",
+  storageBucket: "galaxy-trader.firebasestorage.app",
+  messagingSenderId: "112181709355",
+  appId: "1:112181709355:web:34fab6c42d959fa819786e",
+  measurementId: "G-6TPESCSCKC"
 };
 // Add to firebaseConfig:
 export const userSchema = {

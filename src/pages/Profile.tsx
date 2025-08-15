@@ -73,9 +73,33 @@ const Profile = () => {
 
   // Mini-games catalog — Play button will navigate to the actual game route.
   const MINI_GAMES = [
-    { id: 'run-game', title: 'Run Challenge', desc: 'Tap as fast as you can for 8 seconds', difficulty: 'easy', base: 0.2 },
+   
     { id: 'memory', title: 'Memory Flip', desc: 'Match pairs from memory', difficulty: 'medium', base: 1.0 },
-    { id: 'match3', title: 'Match 3', desc: 'Solve a quick match puzzle', difficulty: 'hard', base: 1.5 }
+    
+    { id: "catch", title: "Comet Catch", desc: "Catch falling comets & gems — avoid bombs!", difficulty: "easy", base: 0.5 },
+    {
+      id: "orbit",
+      title: "Flow — Connect Colors",
+      desc: "Connect each pair of same-colored dots on a grid before time runs out. Paths cannot cross — complete all pairs to earn diamonds.",
+      difficulty: "medium",
+      base: 0.2
+    },
+    { 
+      id: "match3",
+      title: "Match 3 — Sweet Burst",
+      desc: "Swap adjacent candies to match 3 or more of the same color. Create cascades to score points — fast, tactile, mobile-first match-3 gameplay.",
+      difficulty: "hard",
+      base: 0.2
+    },
+    
+    {
+      id: "galaxy-slice",
+      title: "Galaxy Slice",
+      desc: "Swipe to slice glowing cosmic fruits while avoiding bombs. Fast-paced, galaxy-themed Fruit-Ninja style action with starfield visuals.",
+      difficulty: "hard",
+      base: 0.2
+    }
+    
   ];
 
   const hasPlayedToday = (gameId: string) => {

@@ -112,6 +112,13 @@ const Profile = () => {
       desc: "Swipe to slice glowing cosmic fruits while avoiding bombs. Fast-paced, galaxy-themed Fruit-Ninja style action with starfield visuals.",
       difficulty: "hard",
       base: 0.2
+    },
+    {
+      id: "glaxay-blaster",
+      title: "Galaxy Blaster",
+      desc: "Swipe to slice glowing cosmic fruits while avoiding bombs. Fast-paced, galaxy-themed Fruit-Ninja style action with starfield visuals.",
+      difficulty: "hard",
+      base: 0.2
     }
     
   ];

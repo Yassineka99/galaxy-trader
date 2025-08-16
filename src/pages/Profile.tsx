@@ -126,7 +126,14 @@ const Profile = () => {
       desc: "Swipe to slice glowing cosmic fruits while avoiding bombs. Fast-paced, galaxy-themed Fruit-Ninja style action with starfield visuals.",
       difficulty: "hard",
       base: 0.2
-    }
+    },
+    {
+      id: "galaxy-runner",
+      title: "Galaxy Runner",
+      desc: "Swipe to slice glowing cosmic fruits while avoiding bombs. Fast-paced, galaxy-themed Fruit-Ninja style action with starfield visuals.",
+      difficulty: "hard",
+      base: 0.2
+    },
     
   ];
 

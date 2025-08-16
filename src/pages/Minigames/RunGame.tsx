@@ -12,6 +12,7 @@ import SlidePuzzle from "./SlidePuzzle";
 import ChessGame from "./ChessGame";
 import GalaxyBlaster from "./GalaxyBlaster";
 import OrbitDefense from "./OrbitDefense";
+import GalaxyRunner from "./GalaxyRunner";
 //import MatchThree from "./MatchThree";     // new match-3 game component
 
 export default function RunGame() {
@@ -30,15 +31,17 @@ export default function RunGame() {
     case "galaxy-slice":
         return <GalaxySlice />;
     case "match3":
-    return <Match3Game />;
+        return <Match3Game />;
     case "slide-puzzle":
         return <SlidePuzzle />;
     case "chess":
         return <ChessGame />;
     case "glaxay-blaster":
-            return <GalaxyBlaster />;
+        return <GalaxyBlaster />;
     case "orbit-defence":
-            return <OrbitDefense />;
+        return <OrbitDefense />;
+    case "galaxy-runner":
+        return <GalaxyRunner />;
 
    /* case "match3":
       return <MatchThree />;*/

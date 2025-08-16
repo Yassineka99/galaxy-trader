@@ -8,6 +8,8 @@ import ConnectFlowGrid from "./OrbitPuzzle";
 import WaterSortPuzzle from "./WaterSortPuzzle";
 import Match3Game from "./WaterSortPuzzle";
 import GalaxySlice from "./GalaxySlice";
+import SlidePuzzle from "./SlidePuzzle";
+import ChessGame from "./ChessGame";
 //import MatchThree from "./MatchThree";     // new match-3 game component
 
 export default function RunGame() {
@@ -27,6 +29,10 @@ export default function RunGame() {
         return <GalaxySlice />;
     case "match3":
     return <Match3Game />;
+    case "slide-puzzle":
+        return <SlidePuzzle />;
+    case "chess":
+        return <ChessGame />;
 
    /* case "match3":
       return <MatchThree />;*/

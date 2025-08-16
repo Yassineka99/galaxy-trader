@@ -119,6 +119,13 @@ const Profile = () => {
       desc: "Swipe to slice glowing cosmic fruits while avoiding bombs. Fast-paced, galaxy-themed Fruit-Ninja style action with starfield visuals.",
       difficulty: "hard",
       base: 0.2
+    },
+    {
+      id: "orbit-defence",
+      title: "Orbit Defense",
+      desc: "Swipe to slice glowing cosmic fruits while avoiding bombs. Fast-paced, galaxy-themed Fruit-Ninja style action with starfield visuals.",
+      difficulty: "hard",
+      base: 0.2
     }
     
   ];

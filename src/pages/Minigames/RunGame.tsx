@@ -11,6 +11,7 @@ import GalaxySlice from "./GalaxySlice";
 import SlidePuzzle from "./SlidePuzzle";
 import ChessGame from "./ChessGame";
 import GalaxyBlaster from "./GalaxyBlaster";
+import OrbitDefense from "./OrbitDefense";
 //import MatchThree from "./MatchThree";     // new match-3 game component
 
 export default function RunGame() {
@@ -36,6 +37,8 @@ export default function RunGame() {
         return <ChessGame />;
     case "glaxay-blaster":
             return <GalaxyBlaster />;
+    case "orbit-defence":
+            return <OrbitDefense />;
 
    /* case "match3":
       return <MatchThree />;*/
